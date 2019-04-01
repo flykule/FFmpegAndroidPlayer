@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.castle.ffmpeg.player.R
 import com.castle.ffmpeg.player.extensions.exec
+import com.castle.ffmpeg.player.extensions.toFFmpegCommand
 import com.castle.ffmpeg.player.extensions.toFileAsync
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.delay
@@ -46,22 +47,22 @@ class MainActivity : AppCompatActivity() {
      * Extract 1 frame from ffmpeg first
      */
     private fun extractImage() {
-//        ffmpeg -i ./short.mp4 -r 1 -frames:v 1 images/test.jpeg
         val imagePath = cacheDir.path + "/test.jpeg"
-        FFmpeg.getInstance(this).exec("-i", mOriginVideoPath, "-r", "1", "-frames:v", "1", imagePath, handler = object : ExecuteBinaryResponseHandler() {
-            override fun onFailure(message: String?) {
-                Timber.e(message ?: "Some error happened!")
-            }
+        FFmpeg.getInstance(this).exec(*toFFmpegCommand("-i $mOriginVideoPath -r 1 -frames:v 1 $imagePath"),
+                handler = object : ExecuteBinaryResponseHandler() {
+                    override fun onFailure(message: String?) {
+                        Timber.e(message ?: "Some error happened!")
+                    }
 
-            override fun onFinish() {
-                Timber.e("Extract finish")
-            }
+                    override fun onFinish() {
+                        Timber.e("Extract finish")
+                    }
 
-            override fun onSuccess(message: String?) {
-                Timber.e(message)
-                iv_image.setImageBitmap(BitmapFactory.decodeFile(imagePath))
-            }
-        })
+                    override fun onSuccess(message: String?) {
+                        Timber.e(message)
+                        iv_image.setImageBitmap(BitmapFactory.decodeFile(imagePath))
+                    }
+                })
     }
 
     private fun printVideoInfo(path: String) {

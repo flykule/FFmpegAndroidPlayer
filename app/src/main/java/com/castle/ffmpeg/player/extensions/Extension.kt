@@ -354,4 +354,6 @@ fun FFprobe.exec(vararg args: String,handler: FFcommandExecuteResponseHandler = 
     execute(args, handler)
 }
 
+fun Context.toFFmpegCommand(command: String) = command.split(" ").toTypedArray()
+
 
