@@ -17,12 +17,8 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.castle.ffmpeg.player.utils.TimberResponseHandler
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
-import nl.bravobit.ffmpeg.FFcommandExecuteResponseHandler
-import nl.bravobit.ffmpeg.FFmpeg
-import nl.bravobit.ffmpeg.FFprobe
 import java.io.File
 import java.io.InputStream
 import kotlin.jvm.internal.CallableReference
@@ -257,24 +253,24 @@ fun Context?.getActivity(): Activity? {
 /**
  * intent Serizable委托代理类，用法参见LifeCircleRegionActivity，并强转为范型
  */
-class IntentExtraSerizable<out T : java.io.Serializable, in R : T>(private val name: String? = null) {
-
-    private val KProperty<*>.extraName get() = this@IntentExtraSerizable.name ?: fallbackName
-    private val KProperty<*>.fallbackName get() = ownerCanonicalName?.let { "$it::$name" } ?: name
-
-    @SuppressWarnings("unchecked")
-    operator fun getValue(intent: Intent, property: KProperty<*>): T? {
-        val extra = intent.getSerializableExtra(property.extraName)
-//        if (extra.javaClass == rClass.javaClass){
-        return extra as T
-//        }
-//        return null
-    }
-
-    operator fun setValue(intent: Intent, property: KProperty<*>, value: R) {
-        intent.putExtra(property.extraName, value)
-    }
-}
+//class IntentExtraSerizable<out T : java.io.Serializable, in R : T>(private val name: String? = null) {
+//
+//    private val KProperty<*>.extraName get() = this@IntentExtraSerizable.name ?: fallbackName
+//    private val KProperty<*>.fallbackName get() = ownerCanonicalName?.let { "$it::$name" } ?: name
+//
+//    @SuppressWarnings("unchecked")
+//    operator fun getValue(intent: Intent, property: KProperty<*>): T? {
+//        val extra = intent.getSerializableExtra(property.extraName)
+////        if (extra.javaClass == rClass.javaClass){
+//        return extra as R
+////        }
+////        return null
+//    }
+//
+//    operator fun setValue(intent: Intent, property: KProperty<*>, value: R) {
+//        intent.putExtra(property.extraName, value)
+//    }
+//}
 
 /**
  * 设置textview的图片
