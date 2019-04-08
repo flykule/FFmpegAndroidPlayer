@@ -16,11 +16,6 @@ add_library(avcodec
 set_target_properties(avcodec
         PROPERTIES IMPORTED_LOCATION
         ${DIR}/${ANDROID_ABI}/libavcodec.so)
-#if(avcodec)
-#    message("avcodec found success!")
-#else()
-#    message(FATAL_ERROR "avcodec found failed!")
-#endif()
 
 add_library(avdevice
         SHARED

@@ -3,16 +3,17 @@ package com.castle.ffmpeg.player.activity
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.castle.ffmpeg.player.R
+import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
 
 
 class MainActivity : AppCompatActivity() {
 
     companion object {
-
         // Used to load the 'native-lib' library on application startup.
         init {
             try {
+                //Order is important!
                 System.loadLibrary("avutil")
                 System.loadLibrary("swresample")
                 System.loadLibrary("avcodec")
@@ -28,7 +29,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    external fun stringFromJNI(): String
+    private external fun stringFromJNI(): String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +39,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun printStartLog() {
-        Timber.d("Hello from Jni: %s", stringFromJNI())
+//        Timber.d("Hello from Jni: %s", stringFromJNI())
+        tv_center.text = stringFromJNI()
     }
 }
