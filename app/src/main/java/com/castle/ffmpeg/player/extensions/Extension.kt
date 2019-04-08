@@ -346,14 +346,14 @@ fun InputStream.toFileAsync(path: String) = GlobalScope.async {
     }
 }
 
-fun FFmpeg.exec(vararg args: String,handler: FFcommandExecuteResponseHandler = TimberResponseHandler) {
-    execute(args, handler)
-}
-
-fun FFprobe.exec(vararg args: String,handler: FFcommandExecuteResponseHandler = TimberResponseHandler) {
-    execute(args, handler)
-}
-
-fun Context.toFFmpegCommand(command: String) = command.split(" ").toTypedArray()
+//fun FFmpeg.exec(vararg args: String,handler: FFcommandExecuteResponseHandler = TimberResponseHandler) {
+//    execute(args, handler)
+//}
+//
+//fun FFprobe.exec(vararg args: String,handler: FFcommandExecuteResponseHandler = TimberResponseHandler) {
+//    execute(args, handler)
+//}
+//
+//fun Context.toFFmpegCommand(command: String) = command.split(" ").toTypedArray()
 
 

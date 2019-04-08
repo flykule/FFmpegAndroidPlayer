@@ -1,8 +1,11 @@
 <component name="ProjectDictionaryState">
   <dictionary name="castle">
     <words>
+      <w>extern</w>
       <w>fmpeg</w>
       <w>fprobe</w>
+      <w>jnicall</w>
+      <w>jniexport</w>
     </words>
   </dictionary>
 </component>
