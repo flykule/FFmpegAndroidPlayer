@@ -117,9 +117,7 @@ JNIEXPORT void JNICALL Java_com_castle_ffmpeg_player_view_FFSurfaceView_render
                 uint8_t *src = rgbFrame->data[0];
 //            实际内存一行数量
                 int srcStride = rgbFrame->linesize[0];
-                LOGE("srcStride %d", srcStride);
-//                for (int h = 0; h < avctx->height; h++) {
-                    for (int h = 0; h < avctx->height; h++) {
+                for (int h = 0; h < avctx->height; h++) {
                     memcpy(dst + h * destStride,
                            src + h * srcStride,
                            (size_t) destStride);
