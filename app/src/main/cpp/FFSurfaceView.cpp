@@ -113,19 +113,16 @@ JNIEXPORT void JNICALL Java_com_castle_ffmpeg_player_view_FFSurfaceView_render
                 uint8_t *dst = (uint8_t *) nativeWindow_buffer.bits;
 //            拿到一行有多少个字节 RGBA
                 int destStride = nativeWindow_buffer.stride * 4;
-                LOGE("dstStride %d", destStride);
                 //像素数据的首地址
                 uint8_t *src = rgbFrame->data[0];
 //            实际内存一行数量
                 int srcStride = rgbFrame->linesize[0];
                 LOGE("srcStride %d", srcStride);
-                for (int h = 0; h < avctx->height; h++) {
-//                    memcpy(nativeWindow_buffer.bits + h * nativeWindow_buffer.stride,
-                    memcpy(dst + h * nativeWindow_buffer.stride * 4,
-                           rgbFrame->data[0] + h * rgbFrame->linesize[0],
+//                for (int h = 0; h < avctx->height; h++) {
+                    for (int h = 0; h < avctx->height; h++) {
+                    memcpy(dst + h * destStride,
+                           src + h * srcStride,
                            (size_t) destStride);
-//                           (size_t) destStride);
-//                           (size_t) destStride * 4);
                 }
 //解锁
                 ANativeWindow_unlockAndPost(nativeWindow);
