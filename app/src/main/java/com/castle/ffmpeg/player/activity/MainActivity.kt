@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
                 System.loadLibrary("swscale")
                 System.loadLibrary("avfilter")
                 System.loadLibrary("avdevice")
-                System.loadLibrary("videokit")
+//                System.loadLibrary("videokit")
                 System.loadLibrary("native_lib")
             } catch (e: UnsatisfiedLinkError) {
                 e.printStackTrace()

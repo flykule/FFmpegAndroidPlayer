@@ -15,3 +15,4 @@ Java_com_castle_ffmpeg_player_activity_MainActivity_stringFromJNI(
     std::string hello = avcodec_configuration();
     return env->NewStringUTF(hello.c_str());
 }
+
