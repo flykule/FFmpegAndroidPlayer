@@ -3,8 +3,12 @@ package com.castle.ffmpeg.player.activity
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.castle.ffmpeg.player.R
+import com.castle.ffmpeg.player.extensions.toFileAsync
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
+import java.io.File
 
 
 class MainActivity : AppCompatActivity() {
@@ -36,6 +40,28 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         Timber.tag(this::class.java.simpleName)
         printStartLog()
+        saveAssetsVideoToFilesDir()
+    }
+
+    lateinit var mOriginVideoPath: String;
+
+    private fun saveAssetsVideoToFilesDir() = runBlocking {
+        launch {
+            val path = filesDir.path + "/short.mp4"
+            val file = File(path)
+            if (!file.exists()) {
+                val stream = assets.open("short.mp4")
+                if (stream.available() > 0) {
+                    mOriginVideoPath = path
+                    val fileAsync = stream.toFileAsync(path)
+                    fileAsync.await()
+                }
+            }
+            Timber.e("Local video ready, path: %s", path)
+            val async = this@MainActivity.ffs_bottom.playerAsync(path)
+            async.await()
+            return@launch
+        }
     }
 
     private fun printStartLog() {
