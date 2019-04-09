@@ -40,6 +40,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         Timber.tag(this::class.java.simpleName)
         printStartLog()
+//        saveAssetsVideoToFilesDir()
+    }
+
+    override fun onResume() {
+        super.onResume()
         saveAssetsVideoToFilesDir()
     }
 
@@ -58,6 +63,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             Timber.e("Local video ready, path: %s", path)
+//            ffs_bottom.get
             val async = this@MainActivity.ffs_bottom.playerAsync(path)
             async.await()
             return@launch
