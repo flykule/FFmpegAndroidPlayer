@@ -40,13 +40,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         Timber.tag(this::class.java.simpleName)
         printStartLog()
-//        saveAssetsVideoToFilesDir()
+        tv_center.setOnClickListener { saveAssetsVideoToFilesDir() }
     }
 
-    override fun onResume() {
-        super.onResume()
-        saveAssetsVideoToFilesDir()
-    }
 
     lateinit var mOriginVideoPath: String;
 
@@ -72,6 +68,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun printStartLog() {
 //        Timber.d("Hello from Jni: %s", stringFromJNI())
-        tv_center.text = stringFromJNI()
+//        tv_center.text = stringFromJNI()
     }
 }

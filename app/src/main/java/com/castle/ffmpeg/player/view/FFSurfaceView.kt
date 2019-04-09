@@ -17,10 +17,13 @@ class FFSurfaceView : SurfaceView, SurfaceHolder.Callback {
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder?) {
-
+        mSurfaceCreated = false
     }
 
+    var mSurfaceCreated = false
+
     override fun surfaceCreated(holder: SurfaceHolder?) {
+        mSurfaceCreated = true
         Timber.d("Surface created, start render")
         if (!mVideoPath.isEmpty()) {
             val deferred = playerAsync(mVideoPath)
@@ -45,8 +48,13 @@ class FFSurfaceView : SurfaceView, SurfaceHolder.Callback {
 
     fun playerAsync(input: String) = GlobalScope.async {
         mVideoPath = input
-        if (this@FFSurfaceView.holder.surface != null) {
+        Timber.d("Current surface %s isCreating %s", this@FFSurfaceView.holder.surface, this@FFSurfaceView.holder.isCreating)
+//        if (this@FFSurfaceView.holder.surface != null && !this@FFSurfaceView.holder.surface.toString().contains("null")) {
+        if (mSurfaceCreated) {
+//            withContext(Dispatchers.Main) {
             render(input, this@FFSurfaceView.holder.surface)
+//            }
+            mVideoPath = ""
             return@async
         }
         Timber.d("Surface not created, wait for create")

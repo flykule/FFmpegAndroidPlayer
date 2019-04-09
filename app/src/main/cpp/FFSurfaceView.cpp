@@ -2,10 +2,8 @@
 // Created by castle on 4/9/19.
 //
 #include <jni.h>
-#include <libnative-lib/FFSurfaceView.h>
 #include <android/log.h>
-#include <android/native_window.h>
-#include <android/native_window_jni.h>
+#include <libnative-lib/FFSurfaceView.h>
 //#include <android/>
 
 #ifdef __cplusplus
@@ -14,6 +12,10 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libavutil/imgutils.h>
+#include <libswscale/swscale.h>
+#include <android/native_window.h>
+#include <android/native_window_jni.h>
+#include <unistd.h>
 #ifdef __cplusplus
 }
 #endif
@@ -78,13 +80,68 @@ JNIEXPORT void JNICALL Java_com_castle_ffmpeg_player_view_FFSurfaceView_render
     } else {
         LOGD("Get a native window success!");
     }
-//    ANativeWindow_Buffer nativeWindow_buffer;
+    SwsContext *swsContext = sws_getContext(avctx->width, avctx->height, avctx->pix_fmt,
+                                            avctx->width, avctx->height, AV_PIX_FMT_RGBA,
+                                            SWS_BILINEAR,
+                                            nullptr, nullptr, nullptr);
+    ANativeWindow_Buffer nativeWindow_buffer;
+    int frameCount;
+    LOGD("Avcodec attr width %d height %d", avctx->width, avctx->height);
     //Start event loop
     while (av_read_frame(pFormatCtx, packet) >= 0) {
         if (packet->stream_index == videoStream) {
+            avcodec_decode_video2(avctx, pFrame, &frameCount, packet);
+            if (frameCount) {
+                LOGE("Draw frame");
+                //说明有内容
+                //绘制之前配置nativewindow
+                ANativeWindow_setBuffersGeometry(nativeWindow, avctx->width, avctx->height,
+                                                 WINDOW_FORMAT_RGBA_8888);
+                LOGE("Window buffer attr: width %d height %d  stride %d", nativeWindow_buffer.width,
+                     nativeWindow_buffer.height, nativeWindow_buffer.stride);
+                //上锁
+                ANativeWindow_lock(nativeWindow, &nativeWindow_buffer, NULL);
+//                LOGE("Check everything ok...")
+                //转换为rgb格式
+                LOGE("Check everything: %d %d", pFrame->height, rgbFrame->height);
+
+                sws_scale(swsContext, (const uint8_t *const *) pFrame->data, pFrame->linesize, 0,
+                          avctx->height, rgbFrame->data,
+                          rgbFrame->linesize);
+                LOGE("This step ok");
+                //  rgb_frame是有画面数据
+                uint8_t *dst = (uint8_t *) nativeWindow_buffer.bits;
+//            拿到一行有多少个字节 RGBA
+                int destStride = nativeWindow_buffer.stride * 4;
+                LOGE("dstStride %d", destStride);
+                //像素数据的首地址
+                uint8_t *src = rgbFrame->data[0];
+//            实际内存一行数量
+                int srcStride = rgbFrame->linesize[0];
+                LOGE("srcStride %d", srcStride);
+                for (int h = 0; h < avctx->height; h++) {
+//                    memcpy(nativeWindow_buffer.bits + h * nativeWindow_buffer.stride,
+                    memcpy(dst + h * nativeWindow_buffer.stride * 4,
+                           rgbFrame->data[0] + h * rgbFrame->linesize[0],
+                           (size_t) destStride);
+//                           (size_t) destStride);
+//                           (size_t) destStride * 4);
+                }
+//解锁
+                ANativeWindow_unlockAndPost(nativeWindow);
+                usleep(1000 * 16);
+            }
 //            int ret = avcode
         }
+//        av_packet_unref(packet);
+        av_free_packet(packet);
     }
+    ANativeWindow_release(nativeWindow);
+    av_frame_free(&pFrame);
+    av_frame_free(&rgbFrame);
+    avcodec_close(avctx);
+    avformat_free_context(pFormatCtx);
+    env->ReleaseStringUTFChars(sourceUrl, nativeString);
 }
 
 
