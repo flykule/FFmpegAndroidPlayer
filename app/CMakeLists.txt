@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.4.1)
 add_library(native_lib
         SHARED
         src/main/cpp/native_lib.cpp
+        src/main/cpp/native_audio.c
         src/main/cpp/FFSurfaceView.cpp)
 
 find_library(log-lib
@@ -63,4 +64,5 @@ target_link_libraries(native_lib
         avfilter
         avdevice
         ${log-lib}
-        android)
+        android
+        OpenSLES)

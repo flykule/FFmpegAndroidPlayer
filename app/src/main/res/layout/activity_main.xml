@@ -8,7 +8,7 @@
     tools:context=".activity.MainActivity">
 
     <Button
-        android:id="@+id/tv_center"
+        android:id="@+id/btn_play"
         style="@style/Base.TextAppearance.AppCompat.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -21,6 +21,21 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         />
+    <Button
+        android:id="@+id/btn_go_audio"
+        style="@style/Base.TextAppearance.AppCompat.Button"
+        android:layout_width="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_play"
+        android:layout_marginTop="16dp"
+        android:padding="16dp"
+        android:layout_height="50dp"
+        android:background="@android:color/holo_blue_bright"
+        android:clickable="true"
+        android:focusable="true"
+        android:text="Native Audio"
+        android:textColor="@android:color/white"/>
 
     <com.castle.ffmpeg.player.view.FFSurfaceView
         android:id="@+id/ffs_bottom"
@@ -29,7 +44,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_center"
+        app:layout_constraintTop_toBottomOf="@id/btn_play"
         tools:text="123445"/>
 
 

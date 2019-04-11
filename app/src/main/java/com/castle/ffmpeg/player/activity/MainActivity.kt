@@ -1,8 +1,10 @@
 package com.castle.ffmpeg.player.activity
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.castle.ffmpeg.player.R
+import com.castle.ffmpeg.player.extensions.startActivity
 import com.castle.ffmpeg.player.extensions.toFileAsync
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.launch
@@ -40,7 +42,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         Timber.tag(this::class.java.simpleName)
         printStartLog()
-        tv_center.setOnClickListener { saveAssetsVideoToFilesDir() }
+        btn_play.setOnClickListener { saveAssetsVideoToFilesDir() }
+        btn_go_audio.setOnClickListener { startActivity<NativeAudioActivity>() }
     }
 
 
@@ -65,6 +68,7 @@ class MainActivity : AppCompatActivity() {
             return@launch
         }
     }
+
 
     private fun printStartLog() {
 //        Timber.d("Hello from Jni: %s", stringFromJNI())
