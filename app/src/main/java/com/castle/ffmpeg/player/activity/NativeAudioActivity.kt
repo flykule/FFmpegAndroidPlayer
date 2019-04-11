@@ -11,6 +11,7 @@ class NativeAudioActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_native_audio)
+        createEngine()
         btn_play_audio.setOnClickListener { onPlayAudioClick() }
     }
 
@@ -18,7 +19,7 @@ class NativeAudioActivity : AppCompatActivity() {
 
     private val mManager by lazy { assets }
 
-    fun onPlayAudioClick() {
+    private fun onPlayAudioClick() {
         if (createAssetAudioPlayer(mManager, "background.mp3")) {
             isPlayingAsset = !isPlayingAsset;
             setPlayingAssetAudioPlayer(true)
@@ -28,6 +29,13 @@ class NativeAudioActivity : AppCompatActivity() {
     private external fun createAssetAudioPlayer(assetManager: AssetManager, filePath: String): Boolean
 
     private external fun setPlayingAssetAudioPlayer(play: Boolean)
+    private external fun createEngine()
+    private external fun shutdown()
+
+    override fun onDestroy() {
+        super.onDestroy()
+        shutdown()
+    }
 
     /** Called when the activity is about to be destroyed. */
     override fun onPause() {

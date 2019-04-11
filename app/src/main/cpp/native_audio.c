@@ -30,6 +30,17 @@ static SLSeekItf fdPlayerSeek;
 static SLMuteSoloItf fdPlayerMuteSolo;
 static SLVolumeItf fdPlayerVolume;
 
+// a mutext to guard against re-entrance to record & playback
+// as well as make recording and playing back to be mutually exclusive
+// this is to avoid crash at situations like:
+//    recording is in session [not finished]
+//    user presses record button and another recording coming in
+// The action: when recording/playing back is not finished, ignore the new request
+static pthread_mutex_t  audioEngineLock = PTHREAD_MUTEX_INITIALIZER;
+
+// aux effect on the output mix, used by the buffer queue player
+static const SLEnvironmentalReverbSettings reverbSettings =
+        SL_I3DL2_ENVIRONMENT_PRESET_STONECORRIDOR;
 
 // set the playing state for the asset audio player
 JNIEXPORT void JNICALL
@@ -129,3 +140,113 @@ Java_com_castle_ffmpeg_player_activity_NativeAudioActivity_createAssetAudioPlaye
 
     return JNI_TRUE;
 }
+
+// create the engine and output mix objects
+JNIEXPORT void JNICALL
+Java_com_castle_ffmpeg_player_activity_NativeAudioActivity_createEngine(JNIEnv* env, jobject clazz)
+{
+    SLresult result;
+
+    // create engine
+    result = slCreateEngine(&engineObject, 0, NULL, 0, NULL, NULL);
+    assert(SL_RESULT_SUCCESS == result);
+    (void)result;
+
+    // realize the engine
+    result = (*engineObject)->Realize(engineObject, SL_BOOLEAN_FALSE);
+    assert(SL_RESULT_SUCCESS == result);
+    (void)result;
+
+    // get the engine interface, which is needed in order to create other objects
+    result = (*engineObject)->GetInterface(engineObject, SL_IID_ENGINE, &engineEngine);
+    assert(SL_RESULT_SUCCESS == result);
+    (void)result;
+
+    // create output mix, with environmental reverb specified as a non-required interface
+    const SLInterfaceID ids[1] = {SL_IID_ENVIRONMENTALREVERB};
+    const SLboolean req[1] = {SL_BOOLEAN_FALSE};
+    result = (*engineEngine)->CreateOutputMix(engineEngine, &outputMixObject, 1, ids, req);
+    assert(SL_RESULT_SUCCESS == result);
+    (void)result;
+
+    // realize the output mix
+    result = (*outputMixObject)->Realize(outputMixObject, SL_BOOLEAN_FALSE);
+    assert(SL_RESULT_SUCCESS == result);
+    (void)result;
+
+    // get the environmental reverb interface
+    // this could fail if the environmental reverb effect is not available,
+    // either because the feature is not present, excessive CPU load, or
+    // the required MODIFY_AUDIO_SETTINGS permission was not requested and granted
+    result = (*outputMixObject)->GetInterface(outputMixObject, SL_IID_ENVIRONMENTALREVERB,
+                                              &outputMixEnvironmentalReverb);
+    if (SL_RESULT_SUCCESS == result) {
+        result = (*outputMixEnvironmentalReverb)->SetEnvironmentalReverbProperties(
+                outputMixEnvironmentalReverb, &reverbSettings);
+        (void)result;
+    }
+    // ignore unsuccessful result codes for environmental reverb, as it is optional for this example
+
+}
+
+// shut down the native audio system
+JNIEXPORT void JNICALL
+Java_com_castle_ffmpeg_player_activity_NativeAudioActivity_shutdown(JNIEnv* env, jclass clazz)
+{
+
+    // destroy buffer queue audio player object, and invalidate all associated interfaces
+//    if (bqPlayerObject != NULL) {
+//        (*bqPlayerObject)->Destroy(bqPlayerObject);
+//        bqPlayerObject = NULL;
+//        bqPlayerPlay = NULL;
+//        bqPlayerBufferQueue = NULL;
+//        bqPlayerEffectSend = NULL;
+//        bqPlayerMuteSolo = NULL;
+//        bqPlayerVolume = NULL;
+//    }
+
+    // destroy file descriptor audio player object, and invalidate all associated interfaces
+    if (fdPlayerObject != NULL) {
+        (*fdPlayerObject)->Destroy(fdPlayerObject);
+        fdPlayerObject = NULL;
+        fdPlayerPlay = NULL;
+        fdPlayerSeek = NULL;
+        fdPlayerMuteSolo = NULL;
+        fdPlayerVolume = NULL;
+    }
+
+    // destroy URI audio player object, and invalidate all associated interfaces
+//    if (uriPlayerObject != NULL) {
+//        (*uriPlayerObject)->Destroy(uriPlayerObject);
+//        uriPlayerObject = NULL;
+//        uriPlayerPlay = NULL;
+//        uriPlayerSeek = NULL;
+//        uriPlayerMuteSolo = NULL;
+//        uriPlayerVolume = NULL;
+//    }
+
+    // destroy audio recorder object, and invalidate all associated interfaces
+//    if (recorderObject != NULL) {
+//        (*recorderObject)->Destroy(recorderObject);
+//        recorderObject = NULL;
+//        recorderRecord = NULL;
+//        recorderBufferQueue = NULL;
+//    }
+
+    // destroy output mix object, and invalidate all associated interfaces
+    if (outputMixObject != NULL) {
+        (*outputMixObject)->Destroy(outputMixObject);
+        outputMixObject = NULL;
+        outputMixEnvironmentalReverb = NULL;
+    }
+
+    // destroy engine object, and invalidate all associated interfaces
+    if (engineObject != NULL) {
+        (*engineObject)->Destroy(engineObject);
+        engineObject = NULL;
+        engineEngine = NULL;
+    }
+
+    pthread_mutex_destroy(&audioEngineLock);
+}
+
