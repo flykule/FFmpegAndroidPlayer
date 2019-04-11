@@ -5,3 +5,4 @@ This is a project based on complied ffmpeg &amp;&amp; ffprobe, intended to build
 FFmpeg的编译参考了[FFmpeg Build](https://github.com/inFullMobile/videokit-ffmpeg-android),其中我对build.sh进行了适配ubuntu18.0.4的修改
 ## 当前进度
 成功编译集成FFmpeg后,编写了FFSurfaceView,并使用它获取视频流进行了播放
+成功使用OpenSLES播放本地音频,下一步目标是播放原始pcm数据以连接ffmpeg进行播放音频
