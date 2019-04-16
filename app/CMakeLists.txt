@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.4.1)
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -g")
 add_library(native_lib
         SHARED
-        src/main/cpp/native_lib.cpp
-        src/main/cpp/native_audio.c
-        src/main/cpp/FFSurfaceView.cpp)
+        src/main/cpp/mediatimer.c
+        src/main/cpp/native_audio.c)
 
 find_library(log-lib
         log)

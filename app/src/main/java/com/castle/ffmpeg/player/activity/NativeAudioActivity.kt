@@ -26,11 +26,13 @@ class NativeAudioActivity : AppCompatActivity() {
         }
     }
 
-    private external fun createAssetAudioPlayer(assetManager: AssetManager, filePath: String): Boolean
-
-    private external fun setPlayingAssetAudioPlayer(play: Boolean)
-    private external fun createEngine()
-    private external fun shutdown()
+    companion object {
+        external fun createAssetAudioPlayer(assetManager: AssetManager, filePath: String): Boolean
+        external fun createBufferQueueAudioPlayer(sampleRate: Int, samplesPerBuf: Int)
+        external fun setPlayingAssetAudioPlayer(play: Boolean)
+        external fun createEngine()
+        external fun shutdown()
+    }
 
     override fun onDestroy() {
         super.onDestroy()
