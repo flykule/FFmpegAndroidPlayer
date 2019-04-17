@@ -5,7 +5,8 @@ add_library(native_lib
         SHARED
         src/main/cpp/mediatimer.c
         src/main/cpp/decoder.c
-        src/main/cpp/native_audio.c)
+        src/main/cpp/player.c
+        src/main/cpp/main_entry.c)
 
 find_library(log-lib
         log)

@@ -22,6 +22,7 @@ class FFSurfaceView : SurfaceView, SurfaceHolder.Callback {
 
     override fun surfaceDestroyed(holder: SurfaceHolder?) {
         mSurfaceCreated = false
+        shutdown()
     }
 
     var mSurfaceCreated = false
@@ -46,7 +47,7 @@ class FFSurfaceView : SurfaceView, SurfaceHolder.Callback {
         Timber.tag(this::class.java.simpleName)
         holder.setFormat(PixelFormat.RGBA_8888)
         holder.addCallback(this)
-        initAudioEngine()
+//        initAudioEngine()
     }
 
     private var mVideoPath: String = ""
@@ -55,7 +56,10 @@ class FFSurfaceView : SurfaceView, SurfaceHolder.Callback {
         mVideoPath = input
         Timber.d("Current surface %s isCreating %s", this@FFSurfaceView.holder.surface, this@FFSurfaceView.holder.isCreating)
         if (mSurfaceCreated) {
-            render(input, this@FFSurfaceView.holder.surface)
+            if (createPlayer(mVideoPath)) {
+                setPlayingState(true)
+            }
+//            render(input, this@FFSurfaceView.holder.surface)
             mVideoPath = ""
             return@async
         }
@@ -63,6 +67,9 @@ class FFSurfaceView : SurfaceView, SurfaceHolder.Callback {
     }
 
     private external fun render(input: String, surface: Surface)
+    private external fun createPlayer(input: String): Boolean
+    private external fun setPlayingState(play: Boolean)
+    private external fun shutdown()
 
     /**
      * Use quick audio path and sample rate

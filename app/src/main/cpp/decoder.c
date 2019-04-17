@@ -67,7 +67,7 @@ void ReleaseResources(void) {
 
 int CreateDecoder(const char *filepath, VideoInfo *infos) {
     av_register_all();
-    char *errMsg = "";
+    char errMsg[1024];
     if (avformat_open_input(&pFormatContext, filepath, NULL, NULL) != 0) {
         sprintf(errMsg, "Open video file failed! Provided path: %s\n", filepath);
         goto RELEASE;
@@ -77,7 +77,7 @@ int CreateDecoder(const char *filepath, VideoInfo *infos) {
         goto RELEASE;
     }
     videoStream = av_find_best_stream(pFormatContext, AVMEDIA_TYPE_VIDEO, -1, -1, &pVideoCodec, 0);
-    audioStream = av_find_best_stream(pFormatContext, AVMEDIA_TYPE_VIDEO, -1, -1, &pAudioCodec, 0);
+    audioStream = av_find_best_stream(pFormatContext, AVMEDIA_TYPE_AUDIO, -1, -1, &pAudioCodec, 0);
     if (audioStream == -1 || videoStream == -1) {
         sprintf(errMsg,
                 "One of audio/video stream index is invalid! AudioStream index: %d Video stream index: %d",
@@ -103,7 +103,8 @@ int CreateDecoder(const char *filepath, VideoInfo *infos) {
         sprintf(errMsg, "Audio/Video codec context open failed!");
         goto RELEASE;
     }
-    pSwrContext = swr_alloc_set_opts(NULL, (int64_t) pAudioCodecContext->channel_layout,
+    pSwrContext = swr_alloc();
+    pSwrContext = swr_alloc_set_opts(pSwrContext, (int64_t) pAudioCodecContext->channel_layout,
                                      AV_SAMPLE_FMT_S16, pAudioCodecContext->sample_rate,
                                      pAudioCodecContext->channel_layout,
                                      pAudioCodecContext->sample_fmt,
@@ -115,7 +116,8 @@ int CreateDecoder(const char *filepath, VideoInfo *infos) {
     return 0;
     RELEASE:
     if (strlen(errMsg) > 0) {
-        LOGE(errMsg);
+        LOGE("%s", errMsg);
+        free(errMsg);
     }
     ReleaseResources();
     return -1;
@@ -124,37 +126,46 @@ int CreateDecoder(const char *filepath, VideoInfo *infos) {
 int getAudioSource(void **buffer, size_t *buffersize) {
     pPacket = av_packet_alloc();
     pFrame = av_frame_alloc();
+    int frameGot = 0;
     while (av_read_frame(pFormatContext, pPacket) >= 0) {
         if (pPacket->stream_index == audioStream) {
-            int ret = avcodec_send_packet(pAudioCodecContext, pPacket);
-            if (ret != 0) {
-                return -1;
-            }
-            // 循环读取，获取一帧完整PCM音频数据
-            while (avcodec_receive_frame(pAudioCodecContext, pFrame) == 0) {
+//            int ret = avcodec_send_packet(pAudioCodecContext, pPacket);
+//            if (ret < 0) {
+//                return -1;
+//            }
+//            // 循环读取，获取一帧完整PCM音频数据
+            int ret = avcodec_decode_audio4(pAudioCodecContext, pFrame, &frameGot, pPacket);
+            if (frameGot && ret > 0) {
+//            ret = avcodec_receive_frame(pAudioCodecContext, pFrame);
+//            if (ret == AVERROR(EAGAIN)) {
+//                return 0;
+//            }
+//            if (ret < 0) {
+//                return -1;
+//            }
                 LOGD("读取一帧音频数据,frameSize=%d", pFrame->nb_samples);
-                break;
+                //Out Buffer Size
+                int out_buffer_size = av_samples_get_buffer_size(NULL, pFrame->channels,
+                                                                 pFrame->nb_samples,
+                                                                 AV_SAMPLE_FMT_S16, 1);
+                if (internal_buffer != NULL) {
+                    av_free(internal_buffer);
+                    internal_buffer = NULL;
+                }
+                internal_buffer = av_malloc(sizeof(uint8_t) * out_buffer_size);
+                swr_convert(pSwrContext, &internal_buffer, out_buffer_size,
+                            (const uint8_t **) pFrame->data, pFrame->nb_samples);
+                *buffer = internal_buffer;
+                *buffersize = (uint) out_buffer_size;
+                av_packet_unref(pPacket);
+                av_frame_unref(pFrame);
+                pPacket = NULL;
+                pFrame = NULL;
+                return 0;
             }
-            //Out Buffer Size
-            int out_buffer_size = av_samples_get_buffer_size(NULL, pFrame->channels,
-                                                             pFrame->nb_samples,
-                                                             AV_SAMPLE_FMT_S16, 1);
-            if (internal_buffer != NULL) {
-                av_free(internal_buffer);
-                internal_buffer = NULL;
-            }
-            internal_buffer = av_malloc(sizeof(uint8_t) * out_buffer_size);
-            swr_convert(pSwrContext, &internal_buffer, out_buffer_size,
-                        (const uint8_t **) pFrame->data, pFrame->nb_samples);
-            *buffer = internal_buffer;
-            *buffersize = (uint) out_buffer_size;
-            av_packet_unref(pPacket);
-            av_frame_unref(pFrame);
-            pPacket = NULL;
-            pFrame = NULL;
-            return 0;
         }
     }
 
+    return -1;
 }
 

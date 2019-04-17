@@ -24,8 +24,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         Timber.tag(this::class.java.simpleName)
-        printStartLog()
-        initAudioEngine()
+//        printStartLog()
+//        initAudioEngine()
         btn_play.setOnClickListener { saveAssetsVideoToFilesDir() }
         btn_go_audio.setOnClickListener { startActivity<NativeAudioActivity>() }
     }
