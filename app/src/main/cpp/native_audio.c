@@ -37,7 +37,7 @@ static SLVolumeItf fdPlayerVolume;
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
 #include <unistd.h>
-#include <android/log.h>
+#include <libnative-lib/util.h>
 #include <libswresample/swresample.h>
 
 

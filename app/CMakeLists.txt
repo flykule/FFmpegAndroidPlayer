@@ -4,6 +4,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -g")
 add_library(native_lib
         SHARED
         src/main/cpp/mediatimer.c
+        src/main/cpp/decoder.c
         src/main/cpp/native_audio.c)
 
 find_library(log-lib

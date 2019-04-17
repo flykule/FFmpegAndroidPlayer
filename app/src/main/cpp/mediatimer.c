@@ -9,12 +9,10 @@
 #include <libnative-lib/util.h>
 
 static void *MediaTimer(void *);
-
 static void ReleaseTimer(void);
-
 static pthread_t thread_timer_id = 0;
 static pthread_cond_t pcondt = PTHREAD_COND_INITIALIZER;
-static pthread_mutex_t pthreadMutex = PTHREAD_COND_INITIALIZER;
+static pthread_mutex_t pthreadMutex = PTHREAD_MUTEX_INITIALIZER;
 
 int createTimer(TimerParameters *parameters) {
     if (parameters == NULL) {
@@ -61,7 +59,6 @@ void *MediaTimer(void *params) {
         LOGD("位置/时长: %d/%d\n", timerParameters->getPlayPosition(), timerParameters->duration);
     }
     free(params);
-//    pthread_exit(NULL);
     pthread_mutex_unlock(&pthreadMutex);
     return NULL;
 }
