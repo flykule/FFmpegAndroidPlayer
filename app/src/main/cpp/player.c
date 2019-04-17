@@ -200,7 +200,7 @@ void StartPlay(void) {
     }
     (*player)->SetPlayState(player, SL_PLAYSTATE_PLAYING);
     BufferQueuePlayerCallback(androidbufferque, NULL);
-//    startTimer();
+    startTimer();
 }
 
 void StopPlay(void) {

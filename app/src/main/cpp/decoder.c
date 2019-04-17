@@ -126,46 +126,42 @@ int CreateDecoder(const char *filepath, VideoInfo *infos) {
 int getAudioSource(void **buffer, size_t *buffersize) {
     pPacket = av_packet_alloc();
     pFrame = av_frame_alloc();
-    int frameGot = 0;
     while (av_read_frame(pFormatContext, pPacket) >= 0) {
         if (pPacket->stream_index == audioStream) {
-//            int ret = avcodec_send_packet(pAudioCodecContext, pPacket);
-//            if (ret < 0) {
-//                return -1;
-//            }
-//            // 循环读取，获取一帧完整PCM音频数据
-            int ret = avcodec_decode_audio4(pAudioCodecContext, pFrame, &frameGot, pPacket);
-            if (frameGot && ret > 0) {
-//            ret = avcodec_receive_frame(pAudioCodecContext, pFrame);
-//            if (ret == AVERROR(EAGAIN)) {
-//                return 0;
-//            }
-//            if (ret < 0) {
-//                return -1;
-//            }
-                LOGD("读取一帧音频数据,frameSize=%d", pFrame->nb_samples);
-                //Out Buffer Size
-                int out_buffer_size = av_samples_get_buffer_size(NULL, pFrame->channels,
-                                                                 pFrame->nb_samples,
-                                                                 AV_SAMPLE_FMT_S16, 1);
-                if (internal_buffer != NULL) {
-                    av_free(internal_buffer);
-                    internal_buffer = NULL;
-                }
-                internal_buffer = av_malloc(sizeof(uint8_t) * out_buffer_size);
-                swr_convert(pSwrContext, &internal_buffer, out_buffer_size,
-                            (const uint8_t **) pFrame->data, pFrame->nb_samples);
-                *buffer = internal_buffer;
-                *buffersize = (uint) out_buffer_size;
-                av_packet_unref(pPacket);
-                av_frame_unref(pFrame);
-                pPacket = NULL;
-                pFrame = NULL;
-                return 0;
+            int ret = avcodec_send_packet(pAudioCodecContext, pPacket);
+            if (ret < 0) {
+                return -1;
             }
+//            // 循环读取，获取一帧完整PCM音频数据
+            ret = avcodec_receive_frame(pAudioCodecContext, pFrame);
+            if (ret == AVERROR(EAGAIN)) {
+                //Not ready yet
+                continue;
+            }
+            if (ret < 0) {
+                return -1;
+            }
+            //Out Buffer Size
+            int out_buffer_size = av_samples_get_buffer_size(NULL, pFrame->channels,
+                                                             pFrame->nb_samples,
+                                                             AV_SAMPLE_FMT_S16, 1);
+            if (internal_buffer != NULL) {
+                av_free(internal_buffer);
+                internal_buffer = NULL;
+            }
+            internal_buffer = av_malloc(sizeof(uint8_t) * out_buffer_size);
+            swr_convert(pSwrContext, &internal_buffer, out_buffer_size,
+                        (const uint8_t **) pFrame->data, pFrame->nb_samples);
+            *buffer = internal_buffer;
+            *buffersize = (uint) out_buffer_size;
+            av_packet_unref(pPacket);
+            av_frame_unref(pFrame);
+            pPacket = NULL;
+            pFrame = NULL;
+            return 0;
         }
     }
-
+//    }
     return -1;
 }
 
