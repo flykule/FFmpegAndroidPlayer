@@ -7,3 +7,4 @@ FFmpeg的编译参考了[FFmpeg Build](https://github.com/inFullMobile/videokit-
 成功编译集成FFmpeg后,编写了FFSurfaceView,并使用它获取视频流进行了播放
 成功使用OpenSLES播放本地音频,下一步目标是播放原始pcm数据以连接ffmpeg进行播放音频与音画同步
 思路:OpenSLES+bufferedQueue+pcm
+成功播放pcm数据,
