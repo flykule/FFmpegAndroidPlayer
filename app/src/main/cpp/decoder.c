@@ -111,7 +111,7 @@ int CreateDecoder(const char *filepath, VideoInfo *infos) {
                                      pAudioCodecContext->sample_rate, 0, NULL);
     swr_init(pSwrContext);
     infos->channels = pAudioCodecContext->channels;
-    infos->duration = (SLmillisecond) (pFormatContext->duration * 1000) / AV_TIME_BASE;
+    infos->duration =  (pFormatContext->duration * 1000) / AV_TIME_BASE;
     infos->samplerate = pAudioCodecContext->sample_rate;
     return 0;
     RELEASE:
@@ -161,7 +161,6 @@ int getAudioSource(void **buffer, size_t *buffersize) {
             return 0;
         }
     }
-//    }
     return -1;
 }
 

@@ -8,7 +8,7 @@
 #include <SLES/OpenSLES.h>
 
 typedef struct TimerParameters {
-    SLmillisecond duration;  //资源总时长
+    int64_t duration;  //资源总时长
     SLuint32 (*getPlayerState)(void); //当前播放状态
     SLmillisecond (*getPlayPosition)(void); //当前播放进度
 } TimerParameters;

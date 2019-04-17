@@ -52,7 +52,8 @@ Java_com_castle_ffmpeg_player_view_FFSurfaceView_createPlayer(
 JNIEXPORT void JNICALL
 Java_com_castle_ffmpeg_player_view_FFSurfaceView_shutdown(JNIEnv *env,
                                                           jobject clazz) {
-    StopPlay();
+//    StopPlay();
+    ReleaseAll();
 }
 
 JNIEXPORT void JNICALL Java_com_castle_ffmpeg_player_view_FFSurfaceView_render

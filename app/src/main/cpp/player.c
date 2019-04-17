@@ -30,7 +30,7 @@ static SLAndroidSimpleBufferQueueItf androidbufferque = NULL;
 static SLVolumeItf volume = NULL;
 static SLEffectSendItf effectsend = NULL;
 static SLuint32 playerstate = OPENSLES_PLAYERSTATE_UNINITED;
-static SLmillisecond duration = 0;
+static int64_t duration = 0;
 const static SLEnvironmentalReverbSettings envsettings =
         SL_I3DL2_ENVIRONMENT_PRESET_STONEROOM;
 

@@ -13,7 +13,7 @@
 typedef struct VideoInfo {
     int channels;
     int samplerate;
-    SLmillisecond duration;
+    int64_t duration;
 } VideoInfo;
 
 int CreateDecoder(const char *filepath, VideoInfo *infos);
