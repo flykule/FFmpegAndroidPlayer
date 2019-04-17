@@ -2,14 +2,13 @@
 // Created by castle on 4/11/19.
 //
 #include <stdlib.h>
-#include <jni.h>
+//#include <jni.h>
 #include <string.h>
 #include <assert.h>
 // for native asset manager
 #include <sys/types.h>
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
-#include <unistd.h>
 #include <libnative-lib/player.h>
 
 // set the playing state for the asset audio player
@@ -28,6 +27,7 @@ JNIEXPORT jboolean JNICALL
 Java_com_castle_ffmpeg_player_view_FFSurfaceView_createPlayer(
         JNIEnv *env,
         jobject clazz,
+        jobject surface,
         jstring filename) {
     // convert Java string to UTF-8
     const char *utf8 = (*env)->GetStringUTFChars(env, filename, NULL);
@@ -38,7 +38,7 @@ Java_com_castle_ffmpeg_player_view_FFSurfaceView_createPlayer(
     strncpy(mediaInfo->uri, utf8, strlen(utf8) + 1);
     mediaInfo->uri[strlen(utf8)] = '\0';
     (*env)->ReleaseStringUTFChars(env, filename, utf8);
-    int result = CreatePlayerInstance(mediaInfo);
+    int result = CreatePlayerInstance(env, surface, mediaInfo);
     if (result != 0) {
         LOGE("Error in create player instance!");
         ReleaseAll();

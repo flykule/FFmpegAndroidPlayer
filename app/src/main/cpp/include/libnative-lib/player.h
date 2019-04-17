@@ -21,7 +21,7 @@ void ResumePlay(void);
 
 void ReleaseAll(void);
 
-int CreatePlayerInstance(MediaInfo *mediaInfo);
+int CreatePlayerInstance(JNIEnv *env, jobject surface, MediaInfo *mediaInfo);
 
 SLmillisecond getPlayPosition(void);
 

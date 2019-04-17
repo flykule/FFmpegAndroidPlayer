@@ -148,7 +148,7 @@ void ReleasePlayer(void) {
     duration = 0;
 }
 
-int CreatePlayerInstance(MediaInfo *mediaInfo) {
+int CreatePlayerInstance(JNIEnv *env, jobject surface, MediaInfo *mediaInfo) {
     if (!mediaInfo) {
         return -1;
     }
@@ -158,6 +158,11 @@ int CreatePlayerInstance(MediaInfo *mediaInfo) {
     int result = CreateDecoder(filePath, videoInfo);
     if (result != 0) {
         sprintf(errMsg, "Error in create decoder, file path: %s\n", filePath);
+        goto RELEASE;
+    }
+    result = CreateNativeWindow(env, surface);
+    if (result != 0) {
+        sprintf(errMsg, "Error in create native window, file path: %s\n", filePath);
         goto RELEASE;
     }
     if (videoInfo == NULL) {

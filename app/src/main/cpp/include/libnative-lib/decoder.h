@@ -5,10 +5,13 @@
 #ifndef FFMPEGANDROIDPLAYER_DECODER_H
 #define FFMPEGANDROIDPLAYER_DECODER_H
 
+#include <jni.h>
 #include <stdint.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <SLES/OpenSLES.h>
+#include <android/native_window.h>
+#include <android/native_window_jni.h>
 
 typedef struct VideoInfo {
     int channels;
@@ -17,6 +20,8 @@ typedef struct VideoInfo {
 } VideoInfo;
 
 int CreateDecoder(const char *filepath, VideoInfo *infos);
+
+int CreateNativeWindow(JNIEnv *env, jobject surface);
 
 int getAudioSource(void **buffer, size_t *buffersize);
 
